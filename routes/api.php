@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
 
 
     // Resources
+    Route::post('/restaurants/{restaurant}/transfer-ownership', [RestaurantController::class, 'transferOwnership']);
     Route::apiResource('restaurants', RestaurantController::class);
     Route::apiResource('restaurants.tables', TableController::class);
     Route::apiResource('restaurants.categories', CategorieController::class);

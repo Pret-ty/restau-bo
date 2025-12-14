@@ -11,7 +11,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Configure essa/api-tool-kit exception handler
+        $this->app->bind(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \Essa\APIToolKit\Exceptions\Handler::class
+        );
     }
 
     /**
