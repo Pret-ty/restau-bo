@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Restaurant extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
     //
     protected $fillable = [
         'nom',

@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\DB;
 
 class RestaurantController extends Controller
 {
+    public function __construct()
+    {
+        // Apply Policy to resource actions
+        $this->authorizeResource(Restaurant::class, 'restaurant');
+    }
+
     // use ApiResponse;
     /**
      * Display a listing of the resource.
@@ -211,6 +217,8 @@ class RestaurantController extends Controller
             ], 404);
         }
 
+        $this->authorize('update', $restaurant);
+
         $restaurant->update($request->validated());
 
         return response()->json([
@@ -260,6 +268,8 @@ class RestaurantController extends Controller
                 'message' => 'Restaurant non trouvé'
             ], 404);
         }
+
+        $this->authorize('delete', $restaurant);
 
         $restaurant->delete();
 
