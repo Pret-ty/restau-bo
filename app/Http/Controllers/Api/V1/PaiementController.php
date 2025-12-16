@@ -16,6 +16,7 @@ class PaiementController extends Controller
      *      operationId="getPaiementsList",
      *      tags={"Paiements"},
      *      summary="Get list of paiements",
+     *      security={{"sanctum":{}}},
      *      @OA\Parameter(name="commandeId", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(response=200, description="Successful operation")
      * )
@@ -57,6 +58,10 @@ class PaiementController extends Controller
             'statut' => 'required|string'
         ]);
         
+        if ($request->has('commande_id') && $request->commande_id != $commandeId) {
+             abort(400, 'Le commande_id dans le corps de la requête ne correspond pas à l\'URL.');
+        }
+        
         $commande = \App\Models\Commande::findOrFail($commandeId);
         
         // Prevent double payment
@@ -64,7 +69,7 @@ class PaiementController extends Controller
              return response()->json(['success' => false, 'message' => 'Commande déjà payée'], 400);
         }
 
-        $paiement = $commande->paiement()->create($request->all());
+        $paiement = $commande->paiement()->create($request->except(['commande_id']));
 
         return response()->json(['success' => true, 'data' => $paiement], 201);
     }
@@ -75,6 +80,7 @@ class PaiementController extends Controller
      *      operationId="getPaiementById",
      *      tags={"Paiements"},
      *      summary="Get paiement information",
+     *      security={{"sanctum":{}}},
      *      @OA\Parameter(name="commandeId", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(response=200, description="Successful operation")
@@ -115,7 +121,7 @@ class PaiementController extends Controller
             // Keeping it simple as per prompt "Un paiement ne peut passer à valider que si le statut de la commande est cohérent"
         }
 
-        $paiement->update($request->all());
+        $paiement->update($request->except(['commande_id', 'id']));
         return response()->json(['success' => true, 'data' => $paiement]);
     }
 

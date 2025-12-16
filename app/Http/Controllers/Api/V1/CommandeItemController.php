@@ -17,6 +17,13 @@ class CommandeItemController extends Controller
      *      tags={"CommandeItems"},
      *      summary="Get list of commande items",
      *      @OA\Parameter(name="commandeId", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Parameter(
+     *          name="X-Order-Token",
+     *          in="header",
+     *          required=false,
+     *          description="Guest Session Token",
+     *          @OA\Schema(type="string")
+     *      ),
      *      @OA\Response(response=200, description="Successful operation")
      * )
      */
@@ -141,7 +148,7 @@ class CommandeItemController extends Controller
              $this->authorize('update', $item->commande);
         }
 
-        $item->update($request->all());
+        $item->update($request->except(['commande_id', 'id', 'itemable_type', 'itemable_id']));
         
         $item->commande->calculerTotal();
 

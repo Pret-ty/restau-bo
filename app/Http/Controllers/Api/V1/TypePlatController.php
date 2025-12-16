@@ -39,14 +39,18 @@ class TypePlatController extends Controller
     public function store(Request $request, $restaurantId)
     {
         $request->validate(['nom' => 'required|string|max:255']);
+
+        if ($request->has('restaurant_id') && $request->restaurant_id != $restaurantId) {
+             abort(400, 'Le restaurant_id dans le corps de la requête ne correspond pas à l\'URL.');
+        }
         
         $restaurant = \App\Models\Restaurant::findOrFail($restaurantId);
         $this->authorize('update', $restaurant);
 
-        $type = \App\Models\TypePlat::create([
-            'nom' => $request->nom,
-            'restaurant_id' => $restaurantId
-        ]);
+        $type = \App\Models\TypePlat::create(array_merge(
+            $request->except(['restaurant_id']), 
+            ['restaurant_id' => $restaurantId]
+        ));
 
         return response()->json(['success' => true, 'data' => $type], 201);
     }
@@ -85,7 +89,7 @@ class TypePlatController extends Controller
     public function update(Request $request, $restaurantId, $id)
     {
         $type = \App\Models\TypePlat::where('restaurant_id', $restaurantId)->findOrFail($id);
-        $type->update($request->all());
+        $type->update($request->except(['restaurant_id', 'id']));
         return response()->json(['success' => true, 'data' => $type]);
     }
 
