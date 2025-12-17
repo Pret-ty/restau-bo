@@ -41,7 +41,10 @@ class BoissonController extends Controller
             'nom' => 'required|string',
             'prix' => 'required|numeric'
         ]);
-        
+        if ($request->has('restaurant_id') && $request->restaurant_id != $restaurantId) {
+             abort(400, 'Le restaurant_id dans le corps de la requête ne correspond pas à l\'URL.');
+        }
+
         $restaurant = \App\Models\Restaurant::findOrFail($restaurantId);
         $this->authorize('update', $restaurant);
 

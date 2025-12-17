@@ -42,6 +42,9 @@ class CategorieController extends Controller
     {
         $this->authorize('create', \App\Models\Categorie::class);
         $request->validate(['nom' => 'required|string|max:255']);
+        if ($request->has('restaurant_id') && $request->restaurant_id != $restaurantId) {
+             abort(400, 'Le restaurant_id dans le corps de la requête ne correspond pas à l\'URL.');
+        }
         $restaurant = \App\Models\Restaurant::findOrFail($restaurantId);
         $this->authorize('update', $restaurant);
         

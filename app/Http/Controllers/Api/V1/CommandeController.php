@@ -12,7 +12,8 @@ class CommandeController extends Controller
      *      path="/api/v1/tables/{tableId}/commandes",
      *      operationId="getCommandesList",
      *      tags={"Commandes"},
-     *      summary="Get list of commandes",
+     *      summary="Get list of commands",
+     *      security={{"sanctum":{}}},
      *      @OA\Parameter(name="tableId", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(response=200, description="Successful operation")
      * )
@@ -53,6 +54,9 @@ class CommandeController extends Controller
             $this->authorize('create', \App\Models\Commande::class);
         }
         // Statut default 'pending' ?
+        if ($request->has('table_id') && $request->table_id != $tableId) {
+             abort(400, 'Le table_id dans le corps de la requête ne correspond pas à l\'URL.');
+        }
         $table = \App\Models\Table::findOrFail($tableId);
         $commande = $table->commandes()->create([
             'statut' => $request->statut ?? 'en_attente',
@@ -121,7 +125,7 @@ class CommandeController extends Controller
     {
         $commande = \App\Models\Commande::where('table_id', $tableId)->findOrFail($id);
         $this->authorize('update', $commande);
-        $commande->update($request->all());
+        $commande->update($request->except(['table_id', 'id']));
         return response()->json(['success' => true, 'data' => $commande]);
     }
 

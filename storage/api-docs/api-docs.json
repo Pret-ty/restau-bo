@@ -614,7 +614,7 @@
                 "tags": [
                     "Commandes"
                 ],
-                "summary": "Get list of commandes",
+                "summary": "Get list of commands",
                 "operationId": "getCommandesList",
                 "parameters": [
                     {
@@ -630,7 +630,12 @@
                     "200": {
                         "description": "Successful operation"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -822,6 +827,15 @@
                         "required": true,
                         "schema": {
                             "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "X-Order-Token",
+                        "in": "header",
+                        "description": "Guest Session Token",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 ],
@@ -1041,7 +1055,12 @@
                     "200": {
                         "description": "Successful operation"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -1115,7 +1134,12 @@
                     "200": {
                         "description": "Successful operation"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "put": {
                 "tags": [

@@ -219,7 +219,9 @@ class RestaurantController extends Controller
 
         $this->authorize('update', $restaurant);
 
-        $restaurant->update($request->validated());
+        $data = $request->validated();
+        unset($data['proprietaire_id'], $data['id']);
+        $restaurant->update($data);
 
         return response()->json([
             'success' => true,

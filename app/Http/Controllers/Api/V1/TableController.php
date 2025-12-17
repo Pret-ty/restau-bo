@@ -43,6 +43,9 @@ class TableController extends Controller
     {
         $this->authorize('create', \App\Models\Table::class);
         $request->validate(['numero' => 'required|string']);
+        if ($request->has('restaurant_id') && $request->restaurant_id != $restaurantId) {
+             abort(400, 'Le restaurant_id dans le corps de la requête ne correspond pas à l\'URL.');
+        }
         $restaurant = \App\Models\Restaurant::findOrFail($restaurantId);
         $this->authorize('update', $restaurant);
         
@@ -90,7 +93,7 @@ class TableController extends Controller
     {
         $table = \App\Models\Table::where('restaurant_id', $restaurantId)->findOrFail($id);
         $this->authorize('update', $table);
-        $table->update($request->all());
+        $table->update($request->except(['restaurant_id', 'id']));
         return response()->json(['success' => true, 'data' => $table]);
     }
 

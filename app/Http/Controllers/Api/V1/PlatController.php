@@ -47,6 +47,10 @@ class PlatController extends Controller
         ]);
         
         $categorie = \App\Models\Categorie::findOrFail($categorieId);
+
+        if ($request->has('categorie_id') && $request->categorie_id != $categorieId) {
+             abort(400, 'Le categorie_id dans le corps de la requête ne correspond pas à l\'URL.');
+        }
         // Authorize via the restaurant of the category
         $this->authorize('update', $categorie->restaurant);
         
@@ -90,7 +94,7 @@ class PlatController extends Controller
     {
         $plat = \App\Models\Plat::where('categorie_id', $categorieId)->findOrFail($id);
         $this->authorize('update', $plat);
-        $plat->update($request->all());
+        $plat->update($request->except(['categorie_id', 'id', 'restaurant_id'])); // Plat has no restaurant_id column typically, but good practice. Categorie_id determines context.
         return response()->json(['success' => true, 'data' => $plat]);
     }
 
