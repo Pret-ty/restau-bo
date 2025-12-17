@@ -20,7 +20,7 @@ class RestaurantPolicy
 
     public function create(User $user): bool
     {
-        return false; // Only SuperAdmin or special flow creates restaurants? Plan says nothing specific, locking it down.
+        return true; 
     }
 
     public function update(User $user, Restaurant $restaurant): bool
