@@ -19,6 +19,7 @@ class RestaurantResource extends JsonResource
             'nom' => $this->nom,
             'adresse' => $this->adresse,
             'telephone' => $this->telephone,
+            'image' => $this->image,
             'proprietaire_id' => $this->proprietaire_id,
             'proprietaire' => new UserResource($this->whenLoaded('proprietaire')),
             'employes' => UserResource::collection($this->whenLoaded('employes')),

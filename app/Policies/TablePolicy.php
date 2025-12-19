@@ -8,14 +8,14 @@ use Illuminate\Auth\Access\Response;
 
 class TablePolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return $user->hasRole(['ADMIN_RESTAURANT', 'SERVEUR', 'CLIENT']);
+        return true;
     }
 
-    public function view(User $user, Table $table): bool
+    public function view(?User $user, Table $table): bool
     {
-        return $user->hasRole(['ADMIN_RESTAURANT', 'SERVEUR', 'CLIENT']);
+        return true;
     }
 
     public function create(User $user): bool
@@ -25,11 +25,13 @@ class TablePolicy
 
     public function update(User $user, Table $table): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        return $user->hasRole('ADMIN_RESTAURANT') && 
+               ($user->restaurant_id === $table->restaurant_id || $user->id === $table->restaurant->proprietaire_id);
     }
 
     public function delete(User $user, Table $table): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        return $user->hasRole('ADMIN_RESTAURANT') && 
+               ($user->restaurant_id === $table->restaurant_id || $user->id === $table->restaurant->proprietaire_id);
     }
 }

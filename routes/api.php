@@ -26,6 +26,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/restaurants/{restaurant}/type_plats', [\App\Http\Controllers\Api\V1\TypePlatController::class, 'index']);
     Route::get('/restaurants/{restaurant}/boissons', [\App\Http\Controllers\Api\V1\BoissonController::class, 'index']);
     Route::get('/categories/{categorie}/plats', [PlatController::class, 'index']);
+    Route::get('/restaurants/{id}/menu', [RestaurantController::class, 'menu']);
+    Route::get('/restaurants', [RestaurantController::class, 'index']);
+    Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show']);
+    Route::get('/restaurants/{restaurant}/tables', [TableController::class, 'index']);
 
     // Guest Order Creation (Returns Token)
     Route::post('/tables/{table}/commandes', [CommandeController::class, 'store']); 
@@ -56,7 +60,7 @@ Route::prefix('v1')->group(function () {
         // For now, grouping assuming user has Spatie permissions set up, or standard grouping.
         // The user prompted: Route::middleware('role:ADMIN_RESTAURANT')->group(...)
         
-        Route::apiResource('restaurants', RestaurantController::class);
+        Route::apiResource('restaurants', RestaurantController::class)->except(['index', 'show']);
         Route::post('/restaurants/{restaurant}/transfer-ownership', [RestaurantController::class, 'transferOwnership']);
         
         Route::apiResource('restaurants.tables', TableController::class)->except(['index']);
@@ -67,7 +71,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('utilisateurs', UtilisateurController::class);
 
         // 2. Staff Shared Routes (Read Access for specific roles matches Policies usually)
-        Route::get('/restaurants/{restaurant}/tables', [TableController::class, 'index']);
+        Route::get('/restaurants/{restaurant}/commandes', [CommandeController::class, 'restaurantOrders']);
         Route::get('/tables/{table}/commandes', [CommandeController::class, 'index']); 
         
         // 3. Order Management (Servers/Kitchen)

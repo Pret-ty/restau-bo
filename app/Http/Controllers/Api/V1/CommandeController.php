@@ -29,6 +29,20 @@ class CommandeController extends Controller
     }
 
     /**
+     * Get all orders for a restaurant (Staff only).
+     */
+    public function restaurantOrders($restaurantId)
+    {
+        $this->authorize('viewAny', \App\Models\Commande::class);
+        
+        $commandes = \App\Models\Commande::whereHas('table', function($query) use ($restaurantId) {
+            $query->where('restaurant_id', $restaurantId);
+        })->with(['table', 'items.itemable'])->latest()->get();
+
+        return response()->json(['success' => true, 'data' => $commandes]);
+    }
+
+    /**
      * @OA\Post(
      *      path="/api/v1/tables/{tableId}/commandes",
      *      operationId="storeCommande",

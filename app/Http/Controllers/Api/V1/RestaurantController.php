@@ -351,4 +351,33 @@ class RestaurantController extends Controller
             throw $e;
         }
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/restaurants/{id}/menu",
+     *      operationId="getRestaurantMenu",
+     *      tags={"Restaurants"},
+     *      summary="Get restaurant menu (plats and boissons)",
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Successful operation")
+     * )
+     */
+    public function menu($id)
+    {
+        $restaurant = Restaurant::with(['categories.plats', 'boissons'])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'restaurant' => [
+                    'id' => $restaurant->id,
+                    'nom' => $restaurant->nom,
+                    'adresse' => $restaurant->adresse,
+                    'telephone' => $restaurant->telephone,
+                ],
+                'categories' => $restaurant->categories,
+                'boissons' => $restaurant->boissons,
+            ]
+        ]);
+    }
 }

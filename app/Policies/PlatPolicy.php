@@ -29,23 +29,22 @@ class PlatPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        return $user->hasRole('ADMIN_RESTAURANT') || $user->ownedRestaurants()->exists();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Plat $plat): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        // Access restaurant via category
+        $restaurant = $plat->categorie->restaurant;
+        return $user->hasRole('ADMIN_RESTAURANT') && 
+               ($user->restaurant_id === $restaurant->id || $user->id === $restaurant->proprietaire_id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Plat $plat): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        $restaurant = $plat->categorie->restaurant;
+        return $user->hasRole('ADMIN_RESTAURANT') && 
+               ($user->restaurant_id === $restaurant->id || $user->id === $restaurant->proprietaire_id);
     }
 
 }

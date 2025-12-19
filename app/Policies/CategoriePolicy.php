@@ -25,12 +25,14 @@ class CategoriePolicy
 
     public function update(User $user, Categorie $categorie): bool
     {
-        // Must be Admin of the restaurant linked to category
-        return $user->hasRole('ADMIN_RESTAURANT') && $user->restaurant_id === $categorie->restaurant_id;
+        // Must be Admin of the restaurant linked to category, or the Owner
+        return $user->hasRole('ADMIN_RESTAURANT') && 
+               ($user->restaurant_id === $categorie->restaurant_id || $user->id === $categorie->restaurant->proprietaire_id);
     }
 
     public function delete(User $user, Categorie $categorie): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') && $user->restaurant_id === $categorie->restaurant_id;
+        return $user->hasRole('ADMIN_RESTAURANT') && 
+               ($user->restaurant_id === $categorie->restaurant_id || $user->id === $categorie->restaurant->proprietaire_id);
     }
 }

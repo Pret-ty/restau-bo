@@ -44,6 +44,7 @@ class PlatController extends Controller
         $request->validate([
             'nom' => 'required|string',
             'prix' => 'required|numeric',
+            'image' => 'nullable|image|max:2048',
         ]);
         
         $categorie = \App\Models\Categorie::findOrFail($categorieId);
@@ -54,7 +55,13 @@ class PlatController extends Controller
         // Authorize via the restaurant of the category
         $this->authorize('update', $categorie->restaurant);
         
-        $plat = $categorie->plats()->create($request->all());
+        $data = $request->all();
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('plats', 'public');
+            $data['image'] = '/storage/' . $path;
+        }
+
+        $plat = $categorie->plats()->create($data);
 
         return response()->json(['success' => true, 'data' => $plat], 201);
     }
@@ -94,7 +101,16 @@ class PlatController extends Controller
     {
         $plat = \App\Models\Plat::where('categorie_id', $categorieId)->findOrFail($id);
         $this->authorize('update', $plat);
-        $plat->update($request->except(['categorie_id', 'id', 'restaurant_id'])); // Plat has no restaurant_id column typically, but good practice. Categorie_id determines context.
+        
+        $data = $request->except(['categorie_id', 'id', 'restaurant_id']);
+        
+        if ($request->hasFile('image')) {
+            $request->validate(['image' => 'image|max:2048']);
+            $path = $request->file('image')->store('plats', 'public');
+            $data['image'] = '/storage/' . $path;
+        }
+
+        $plat->update($data);
         return response()->json(['success' => true, 'data' => $plat]);
     }
 

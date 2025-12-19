@@ -22,9 +22,7 @@ class RestaurantScope implements Scope
             // Adjust logic based on how you identify 'Global Admin' vs 'Restaurant User'
             // For now, assuming all BO users must belong to a restaurant to see data
             if ($user->restaurant_id) {
-                 // Direct relationship for Table/Categorie
-                 // Nested relationship for Plat/Commande must be handled by the model
-                 
+                 // Employee logic: restrict to assigned restaurant
                  if ($model instanceof \App\Models\Table || $model instanceof \App\Models\Categorie || $model instanceof \App\Models\Boisson || $model instanceof \App\Models\TypePlat) {
                      $builder->where('restaurant_id', $user->restaurant_id);
                  }
@@ -42,6 +40,27 @@ class RestaurantScope implements Scope
                          $query->where('restaurant_id', $user->restaurant_id);
                      });
                  }
+            } else {
+                // Owner logic: restrict to owned restaurants
+                $ownedRestaurantIds = \App\Models\Restaurant::where('proprietaire_id', $user->id)->pluck('id');
+                
+                if ($ownedRestaurantIds->isNotEmpty()) {
+                    if ($model instanceof \App\Models\Table || $model instanceof \App\Models\Categorie || $model instanceof \App\Models\Boisson || $model instanceof \App\Models\TypePlat) {
+                        $builder->whereIn('restaurant_id', $ownedRestaurantIds);
+                    }
+
+                    if ($model instanceof \App\Models\Plat) {
+                        $builder->whereHas('categorie', function ($query) use ($ownedRestaurantIds) {
+                            $query->whereIn('restaurant_id', $ownedRestaurantIds);
+                        });
+                    }
+
+                    if ($model instanceof \App\Models\Commande) {
+                         $builder->whereHas('table', function ($query) use ($ownedRestaurantIds) {
+                             $query->whereIn('restaurant_id', $ownedRestaurantIds);
+                         });
+                    }
+                }
             }
         }
     }
