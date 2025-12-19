@@ -11,7 +11,7 @@ class StoreRestaurantRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreRestaurantRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nom' => 'required|string|max:255',
+            'adresse' => 'nullable|string|max:255',
+            'telephone' => 'nullable|string|max:20',
+            'proprietaire_id' => 'required|exists:users,id',
         ];
     }
 }

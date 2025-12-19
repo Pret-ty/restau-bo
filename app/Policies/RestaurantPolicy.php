@@ -8,59 +8,31 @@ use Illuminate\Auth\Access\Response;
 
 class RestaurantPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return false;
+        return true; // Everyone can see restaurants (listing)
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Restaurant $restaurant): bool
+    public function view(?User $user, Restaurant $restaurant): bool
     {
-        return false;
+        return true; // Public or Internal read access
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return false;
+        return true; 
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Restaurant $restaurant): bool
     {
-        return false;
+        // Only Owner (ADMIN_RESTAURANT and owner of this restaurant)
+        return $user->id === $restaurant->proprietaire_id || ($user->hasRole('ADMIN_RESTAURANT') && $user->restaurant_id === $restaurant->id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Restaurant $restaurant): bool
     {
-        return false;
+        return $user->hasRole('ADMIN_RESTAURANT') && $user->id === $restaurant->proprietaire_id;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Restaurant $restaurant): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Restaurant $restaurant): bool
-    {
-        return false;
-    }
+    // Other methods remain false or typically not used yet
 }
