@@ -20,7 +20,9 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
             'restaurant_id' => $this->restaurant_id,
-            'roles' => $this->roles->pluck('name'),
+            'roles' => $this->roles->map(function($role) {
+                return ['name' => $role->name];
+            }),
             'restaurant' => new RestaurantResource($this->whenLoaded('restaurant')),
             'owned_restaurant' => new RestaurantResource($this->whenLoaded('ownedRestaurant')),
             'created_at' => $this->created_at,

@@ -25,13 +25,13 @@ class RestaurantPolicy
 
     public function update(User $user, Restaurant $restaurant): bool
     {
-        // Only Owner (ADMIN_RESTAURANT and owner of this restaurant)
-        return $user->id === $restaurant->proprietaire_id || ($user->hasRole('ADMIN_RESTAURANT') && $user->restaurant_id === $restaurant->id);
+        // Only Owner (ADMIN and owner of this restaurant)
+        return $user->id === $restaurant->proprietaire_id || ($user->hasRole('ADMIN') && $user->restaurant_id === $restaurant->id);
     }
 
     public function delete(User $user, Restaurant $restaurant): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') && $user->id === $restaurant->proprietaire_id;
+        return $user->hasRole('ADMIN') && $user->id === $restaurant->proprietaire_id;
     }
 
     // Other methods remain false or typically not used yet

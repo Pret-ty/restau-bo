@@ -20,19 +20,19 @@ class CategoriePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        return $user->hasRole('ADMIN');
     }
 
     public function update(User $user, Categorie $categorie): bool
     {
         // Must be Admin of the restaurant linked to category, or the Owner
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $categorie->restaurant_id || $user->id === $categorie->restaurant->proprietaire_id);
     }
 
     public function delete(User $user, Categorie $categorie): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $categorie->restaurant_id || $user->id === $categorie->restaurant->proprietaire_id);
     }
 }

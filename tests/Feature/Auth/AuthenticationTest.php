@@ -17,7 +17,7 @@ class AuthenticationTest extends TestCase
     {
         parent::setUp();
         // Create roles
-        $roles = ['CLIENT', 'ADMIN_RESTAURANT'];
+        $roles = ['CLIENT', 'ADMIN'];
         foreach ($roles as $role) {
             Role::create(['name' => $role]);
         }

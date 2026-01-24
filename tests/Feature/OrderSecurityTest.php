@@ -20,7 +20,7 @@ class OrderSecurityTest extends TestCase
     {
         parent::setUp();
         // Create basic roles
-        foreach (['ADMIN_RESTAURANT', 'SERVEUR', 'CUISINIER', 'CAISSIER'] as $role) {
+        foreach (['ADMIN', 'SERVEUR', 'CUISINIER', 'CAISSIER'] as $role) {
             if (!Role::where('name', $role)->exists()) {
                 Role::create(['name' => $role, 'guard_name' => 'web']);
             }
@@ -31,7 +31,7 @@ class OrderSecurityTest extends TestCase
     {
         // Setup
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
         $table = Table::factory()->create(['restaurant_id' => $restaurant->id]);
@@ -54,7 +54,7 @@ class OrderSecurityTest extends TestCase
     {
         // Owner A
         $ownerA = User::factory()->create();
-        $ownerA->assignRole('ADMIN_RESTAURANT');
+        $ownerA->assignRole('ADMIN');
         $restaurantA = Restaurant::factory()->create(['proprietaire_id' => $ownerA->id]);
         $ownerA->restaurant_id = $restaurantA->id; $ownerA->save();
 
@@ -76,7 +76,7 @@ class OrderSecurityTest extends TestCase
     public function test_admin_cannot_update_items_of_other_restaurant()
     {
         $ownerA = User::factory()->create();
-        $ownerA->assignRole('ADMIN_RESTAURANT');
+        $ownerA->assignRole('ADMIN');
         $restaurantA = Restaurant::factory()->create(['proprietaire_id' => $ownerA->id]);
         $ownerA->restaurant_id = $restaurantA->id; $ownerA->save();
 
@@ -125,7 +125,7 @@ class OrderSecurityTest extends TestCase
     public function test_admin_cannot_access_other_paiement()
     {
         $ownerA = User::factory()->create();
-        $ownerA->assignRole('ADMIN_RESTAURANT');
+        $ownerA->assignRole('ADMIN');
         $restaurantA = Restaurant::factory()->create(['proprietaire_id' => $ownerA->id]);
         $ownerA->restaurant_id = $restaurantA->id; $ownerA->save();
 

@@ -19,18 +19,18 @@ class BoissonPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        return $user->hasRole('ADMIN');
     }
 
     public function update(User $user, Boisson $boisson): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $boisson->restaurant_id || $user->id === $boisson->restaurant->proprietaire_id);
     }
 
     public function delete(User $user, Boisson $boisson): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $boisson->restaurant_id || $user->id === $boisson->restaurant->proprietaire_id);
     }
 }

@@ -125,7 +125,7 @@ class AuthController extends Controller
             'success' => true,
             'data' => [
                 'token' => $token,
-                'user' => UserResource::make($user->load('roles')),
+                'user' => UserResource::make($user->load(['roles', 'restaurant', 'ownedRestaurant'])),
             ],
             'message' => 'Connexion réussie'
         ]);

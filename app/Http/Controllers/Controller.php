@@ -11,7 +11,7 @@ namespace App\Http\Controllers;
  *          email="admin@restautyty.com"
  *      ),
  *      @OA\License(
- *          name="Apache 2.0",
+ *          name="Apache 2.0",  
  *          url="http://www.apache.org/licenses/LICENSE-2.0.html"
  *      )
  * )

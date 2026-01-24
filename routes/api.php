@@ -22,6 +22,18 @@ Route::prefix('v1')->group(function () {
      * PUBLIC / GUEST ROUTES (Client facing)
      */
     // View Restaurant Menu (Public)
+    Route::get('/debug-models', function() {
+        try {
+            $models = Gemini\Laravel\Facades\Gemini::listModels();
+            return collect($models->models)->pluck('name');
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    });
+
+    Route::post('/chat/recommend', [App\Http\Controllers\Api\V1\ChatbotController::class, 'recommend']);
+
+
     Route::get('/restaurants/{restaurant}/categories', [CategorieController::class, 'index']); 
     Route::get('/restaurants/{restaurant}/type_plats', [\App\Http\Controllers\Api\V1\TypePlatController::class, 'index']);
     Route::get('/restaurants/{restaurant}/boissons', [\App\Http\Controllers\Api\V1\BoissonController::class, 'index']);
@@ -55,12 +67,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
-        // 1. ADMIN_RESTAURANT Routes
+        // 1. ADMIN Routes
         // (Assuming standard Spatie middleware is 'role:name', but user is okay with logic implementation first if not present)
         // For now, grouping assuming user has Spatie permissions set up, or standard grouping.
-        // The user prompted: Route::middleware('role:ADMIN_RESTAURANT')->group(...)
+        // The user prompted: Route::middleware('role:ADMIN')->group(...)
         
         Route::apiResource('restaurants', RestaurantController::class)->except(['index', 'show']);
+        Route::get('/restaurants/{restaurant}/stats', [RestaurantController::class, 'stats']);
         Route::post('/restaurants/{restaurant}/transfer-ownership', [RestaurantController::class, 'transferOwnership']);
         
         Route::apiResource('restaurants.tables', TableController::class)->except(['index']);

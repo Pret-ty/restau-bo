@@ -31,6 +31,6 @@ class DatabaseSeeder extends Seeder
             'nom' => 'Test Admin Restaurant',
             'email' => 'admin@example.com',
         ]);
-        $admin->assignRole('ADMIN_RESTAURANT');
+        $admin->assignRole('ADMIN');
     }
 }

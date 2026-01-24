@@ -18,7 +18,7 @@ class RestaurantScope implements Scope
         if (Auth::check()) {
             $user = Auth::user();
 
-            // If user is ADMIN_RESTAURANT or generic Employee, restrict to their restaurant
+            // If user is ADMIN or generic Employee, restrict to their restaurant
             // Adjust logic based on how you identify 'Global Admin' vs 'Restaurant User'
             // For now, assuming all BO users must belong to a restaurant to see data
             if ($user->restaurant_id) {

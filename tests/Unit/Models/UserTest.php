@@ -16,7 +16,7 @@ class UserTest extends TestCase
     {
         parent::setUp();
         // Create roles
-        Role::create(['name' => 'ADMIN_RESTAURANT']);
+        Role::create(['name' => 'ADMIN']);
     }
 
     public function test_user_has_roles_trait()
@@ -28,9 +28,9 @@ class UserTest extends TestCase
     public function test_user_can_be_assigned_role()
     {
         $user = User::factory()->create();
-        $user->assignRole('ADMIN_RESTAURANT');
+        $user->assignRole('ADMIN');
         
-        $this->assertTrue($user->hasRole('ADMIN_RESTAURANT'));
+        $this->assertTrue($user->hasRole('ADMIN'));
     }
 
     public function test_is_manager_method()
@@ -38,7 +38,7 @@ class UserTest extends TestCase
         $user = User::factory()->create();
         $this->assertFalse($user->isManager());
 
-        $user->assignRole('ADMIN_RESTAURANT');
+        $user->assignRole('ADMIN');
         $this->assertTrue($user->isManager());
     }
 

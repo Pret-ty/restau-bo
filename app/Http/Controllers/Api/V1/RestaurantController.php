@@ -16,8 +16,8 @@ class RestaurantController extends Controller
 {
     public function __construct()
     {
-        // Apply Policy to resource actions
-        $this->authorizeResource(Restaurant::class, 'restaurant');
+        // Apply Policy to resource actions, except public ones
+        $this->authorizeResource(Restaurant::class, 'restaurant', ['except' => ['index', 'show']]);
     }
 
     // use ApiResponse;
@@ -96,11 +96,9 @@ class RestaurantController extends Controller
                 'proprietaire_id' => $request->proprietaire_id,
             ]);
 
-            // 2. Assigner le rôle ADMIN_RESTAURANT au propriétaire
+            // 2. Assigner le rôle ADMIN au propriétaire et retirer CLIENT
             $proprietaire = User::findOrFail($request->proprietaire_id);
-            if (!$proprietaire->hasRole('ADMIN_RESTAURANT')) {
-                $proprietaire->assignRole('ADMIN_RESTAURANT');
-            }
+            $proprietaire->syncRoles(['ADMIN']);
 
             // 3. Lier le propriétaire au restaurant
             $proprietaire->restaurant_id = $restaurant->id;
@@ -147,22 +145,11 @@ class RestaurantController extends Controller
      *      @OA\Response(response=404, description="Restaurant not found")
      * )
      */
-    public function show(string $id)
+    public function show(Restaurant $restaurant)
     {
-        //Afficher un restaurant
-        $restaurant = Restaurant::with(['proprietaire', 'employes', 'categories'])
-            ->find($id);
-
-        if (!$restaurant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Restaurant non trouvé'
-            ], 404);
-        }
-
         return response()->json([
             'success' => true,
-            'data' => RestaurantResource::make($restaurant)
+            'data' => RestaurantResource::make($restaurant->load(['proprietaire', 'employes', 'categories']))
         ]);
     }
 
@@ -221,6 +208,7 @@ class RestaurantController extends Controller
 
         $data = $request->validated();
         unset($data['proprietaire_id'], $data['id']);
+
         $restaurant->update($data);
 
         return response()->json([
@@ -328,14 +316,14 @@ class RestaurantController extends Controller
             // Retirer le rôle de l'ancien propriétaire si nécessaire
             // (seulement s'il ne possède pas d'autre restaurant)
             if ($oldOwner && !$oldOwner->ownedRestaurant()->where('id', '!=', $restaurant->id)->exists()) {
-                $oldOwner->removeRole('ADMIN_RESTAURANT');
+                $oldOwner->removeRole('ADMIN');
             }
 
             // Assigner au nouveau propriétaire
             $restaurant->proprietaire_id = $newOwner->id;
             $restaurant->save();
 
-            $newOwner->assignRole('ADMIN_RESTAURANT');
+            $newOwner->assignRole('ADMIN');
             $newOwner->restaurant_id = $restaurant->id;
             $newOwner->save();
 
@@ -377,6 +365,87 @@ class RestaurantController extends Controller
                 ],
                 'categories' => $restaurant->categories,
                 'boissons' => $restaurant->boissons,
+            ]
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/restaurants/{restaurant}/stats",
+     *      operationId="getRestaurantStats",
+     *      tags={"Restaurants"},
+     *      summary="Get restaurant performance statistics",
+     *      security={{"sanctum":{}}},
+     *      @OA\Parameter(name="restaurant", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Successful operation")
+     * )
+     */
+    public function stats(Restaurant $restaurant)
+    {
+        $this->authorize('update', $restaurant);
+
+        // 1. Top 3 Plats par quantité vendue
+        $topPlats = \App\Models\CommandeItem::where('itemable_type', \App\Models\Plat::class)
+            ->whereHas('commande.table', function ($query) use ($restaurant) {
+                $query->where('restaurant_id', $restaurant->id);
+            })
+            ->select('itemable_id', DB::raw('SUM(quantite) as total_ventes'))
+            ->groupBy('itemable_id')
+            ->orderByDesc('total_ventes')
+            ->take(3)
+            ->get();
+
+        // Charger les noms des plats
+        $topPlatsData = $topPlats->map(function ($item) {
+            $plat = \App\Models\Plat::find($item->itemable_id);
+            return [
+                'id' => $item->itemable_id,
+                'nom' => $plat ? $plat->nom : 'Plat supprimé',
+                'image' => $plat ? $plat->image : null,
+                'total_ventes' => (int)$item->total_ventes,
+            ];
+        });
+
+        // 2. Statistiques par catégorie (Nombre de plats)
+        $categoriesStats = $restaurant->categories()->withCount('plats')->get()->map(function ($cat) {
+            return [
+                'id' => $cat->id,
+                'nom' => $cat->nom,
+                'plats_count' => $cat->plats_count
+            ];
+        });
+
+        // 3. Comptes généraux
+        $counts = [
+            'total_plats' => \App\Models\Plat::whereHas('categorie', function ($q) use ($restaurant) {
+                $q->where('restaurant_id', $restaurant->id);
+            })->count(),
+            'total_boissons' => $restaurant->boissons()->count(),
+            'total_employes' => $restaurant->employes()->count(),
+            'total_tables' => $restaurant->tables()->count(),
+            'total_commandes' => \App\Models\Commande::whereHas('table', function ($q) use ($restaurant) {
+                $q->where('restaurant_id', $restaurant->id);
+            })->count(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'restaurant' => [
+                    'id' => $restaurant->id,
+                    'nom' => $restaurant->nom,
+                    'adresse' => $restaurant->adresse,
+                    'telephone' => $restaurant->telephone,
+                    'proprietaire' => $restaurant->proprietaire ? [
+                        'nom' => $restaurant->proprietaire->nom,
+                        'email' => $restaurant->proprietaire->email,
+                    ] : null,
+                ],
+                'stats' => [
+                    'top_plats' => $topPlatsData,
+                    'categories' => $categoriesStats,
+                    'counts' => $counts
+                ]
             ]
         ]);
     }

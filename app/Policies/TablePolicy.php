@@ -20,18 +20,18 @@ class TablePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT');
+        return $user->hasRole('ADMIN');
     }
 
     public function update(User $user, Table $table): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $table->restaurant_id || $user->id === $table->restaurant->proprietaire_id);
     }
 
     public function delete(User $user, Table $table): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $table->restaurant_id || $user->id === $table->restaurant->proprietaire_id);
     }
 }

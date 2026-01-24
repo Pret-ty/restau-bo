@@ -24,7 +24,7 @@ class StoreRestaurantRequest extends FormRequest
         return [
             'nom' => 'required|string|max:255',
             'adresse' => 'nullable|string|max:255',
-            'telephone' => 'nullable|string|max:20',
+            'telephone' => 'required|string|max:20',
             'proprietaire_id' => 'required|exists:users,id',
         ];
     }

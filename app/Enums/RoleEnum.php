@@ -8,5 +8,5 @@ enum RoleEnum: string
     case CUISINIER = 'CUISINIER';
     case CAISSIER = 'CAISSIER';
     case SERVEUR = 'SERVEUR';
-    case ADMIN_RESTAURANT = 'ADMIN_RESTAURANT';
+    case ADMIN = 'ADMIN';
 }

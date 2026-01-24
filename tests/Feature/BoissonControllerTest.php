@@ -18,15 +18,15 @@ class BoissonControllerTest extends TestCase
     {
         parent::setUp();
         // Create Role if not exists
-        if (!Role::where('name', 'ADMIN_RESTAURANT')->exists()) {
-            Role::create(['name' => 'ADMIN_RESTAURANT', 'guard_name' => 'web']);
+        if (!Role::where('name', 'ADMIN')->exists()) {
+            Role::create(['name' => 'ADMIN', 'guard_name' => 'web']);
         }
     }
 
     public function test_admin_can_add_boisson_to_own_restaurant()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id;
         $owner->save();
@@ -43,7 +43,7 @@ class BoissonControllerTest extends TestCase
     public function test_admin_cannot_add_boisson_to_other_restaurant()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id;
         $owner->save();
@@ -63,7 +63,7 @@ class BoissonControllerTest extends TestCase
     public function test_admin_can_update_own_boisson()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id;
         $owner->save();
@@ -81,7 +81,7 @@ class BoissonControllerTest extends TestCase
     public function test_admin_cannot_update_other_restaurant_boisson()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id;
         $owner->save();
@@ -114,7 +114,7 @@ class BoissonControllerTest extends TestCase
     public function test_admin_can_delete_own_boisson()
     {
          $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id;
         $owner->save();
@@ -129,7 +129,7 @@ class BoissonControllerTest extends TestCase
     public function test_admin_cannot_change_boisson_restaurant_via_update()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
 
