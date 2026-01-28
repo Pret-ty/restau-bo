@@ -55,7 +55,7 @@ class User extends Authenticatable
      */
     public function isManager(): bool
     {
-        return $this->hasRole('ADMIN_RESTAURANT');
+        return $this->hasRole('ADMIN');
     }
 
     /**

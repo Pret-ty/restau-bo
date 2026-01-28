@@ -9,7 +9,7 @@ class TableFactory extends Factory
     public function definition(): array
     {
         return [
-            'numero' => 'T' . fake()->numberBetween(1, 100),
+            'numero' => 'T' . $this->faker->numberBetween(1, 100),
             'restaurant_id' => \App\Models\Restaurant::factory(),
         ];
     }

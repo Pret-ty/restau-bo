@@ -19,8 +19,8 @@ class ResourceControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        if (!Role::where('name', 'ADMIN_RESTAURANT')->exists()) {
-            Role::create(['name' => 'ADMIN_RESTAURANT', 'guard_name' => 'web']);
+        if (!Role::where('name', 'ADMIN')->exists()) {
+            Role::create(['name' => 'ADMIN', 'guard_name' => 'web']);
         }
     }
 
@@ -28,7 +28,7 @@ class ResourceControllerTest extends TestCase
     public function test_admin_can_manage_own_table()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
 
@@ -49,7 +49,7 @@ class ResourceControllerTest extends TestCase
     public function test_admin_cannot_access_other_restaurant_table()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
 
@@ -69,7 +69,7 @@ class ResourceControllerTest extends TestCase
     public function test_admin_can_manage_own_categorie()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
 
@@ -90,7 +90,7 @@ class ResourceControllerTest extends TestCase
     public function test_admin_cannot_manage_other_categorie()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
 
@@ -106,7 +106,7 @@ class ResourceControllerTest extends TestCase
     public function test_admin_can_manage_own_plat()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
 
@@ -129,7 +129,7 @@ class ResourceControllerTest extends TestCase
     public function test_admin_cannot_manage_other_plat()
     {
         $owner = User::factory()->create();
-        $owner->assignRole('ADMIN_RESTAURANT');
+        $owner->assignRole('ADMIN');
         $restaurant = Restaurant::factory()->create(['proprietaire_id' => $owner->id]);
         $owner->restaurant_id = $restaurant->id; $owner->save();
 

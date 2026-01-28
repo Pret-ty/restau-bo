@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TableController extends Controller
 {
@@ -115,5 +116,31 @@ class TableController extends Controller
         $this->authorize('delete', $table);
         $table->delete();
         return response()->json(['success' => true, 'message' => 'Table supprimée']);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/restaurants/{restaurantId}/tables/{id}/qrcode",
+     *      operationId="getTableQrCode",
+     *      tags={"Tables"},
+     *      summary="Generate QR code for a table",
+     *      @OA\Parameter(name="restaurantId", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="SVG QR Code")
+     * )
+     */
+    public function generateQrCode($restaurantId, $id)
+    {
+        $table = \App\Models\Table::where('restaurant_id', $restaurantId)->findOrFail($id);
+        
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $url = "{$frontendUrl}/restaurants/{$restaurantId}/menu?table={$table->id}";
+
+        $qrCode = QrCode::size(300)
+            ->format('svg')
+            ->margin(1)
+            ->generate($url);
+
+        return response($qrCode)->header('Content-Type', 'image/svg+xml');
     }
 }

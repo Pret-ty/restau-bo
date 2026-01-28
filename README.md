@@ -98,4 +98,4 @@ Le système utilise `spatie/laravel-permission`. Un seeder est disponible pour i
 ```bash
 php artisan db:seed
 ```
-Role principal : `ADMIN_RESTAURANT`
+Role principal : `ADMIN`

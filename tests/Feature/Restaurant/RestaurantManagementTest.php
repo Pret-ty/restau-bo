@@ -16,7 +16,7 @@ class RestaurantManagementTest extends TestCase
     {
         parent::setUp();
         // Create roles
-        Role::create(['name' => 'ADMIN_RESTAURANT']);
+        Role::create(['name' => 'ADMIN']);
         Role::create(['name' => 'CLIENT']);
     }
 
@@ -34,7 +34,7 @@ class RestaurantManagementTest extends TestCase
         $response->assertStatus(201);
         
         $owner->refresh();
-        $this->assertTrue($owner->hasRole('ADMIN_RESTAURANT'));
+        $this->assertTrue($owner->hasRole('ADMIN'));
         $this->assertNotNull($owner->restaurant_id);
     }
 
@@ -42,7 +42,7 @@ class RestaurantManagementTest extends TestCase
     {
         // Setup initial state
         $oldOwner = User::factory()->create();
-        $oldOwner->assignRole('ADMIN_RESTAURANT');
+        $oldOwner->assignRole('ADMIN');
         
         $restaurant = Restaurant::create([
             'nom' => 'Transfer Restaurant',
@@ -65,11 +65,11 @@ class RestaurantManagementTest extends TestCase
 
         // Verify Old Owner
         $oldOwner->refresh();
-        $this->assertFalse($oldOwner->hasRole('ADMIN_RESTAURANT')); // Should lose role if no other restaurants
+        $this->assertFalse($oldOwner->hasRole('ADMIN')); // Should lose role if no other restaurants
         
         // Verify New Owner
         $newOwner->refresh();
-        $this->assertTrue($newOwner->hasRole('ADMIN_RESTAURANT'));
+        $this->assertTrue($newOwner->hasRole('ADMIN'));
         $this->assertEquals($restaurant->id, $newOwner->restaurant_id);
         
         // Verify Restaurant

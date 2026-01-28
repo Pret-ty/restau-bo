@@ -29,21 +29,21 @@ class PlatPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('ADMIN_RESTAURANT') || $user->ownedRestaurants()->exists();
+        return $user->hasRole('ADMIN') || $user->ownedRestaurant()->exists();
     }
 
     public function update(User $user, Plat $plat): bool
     {
         // Access restaurant via category
         $restaurant = $plat->categorie->restaurant;
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $restaurant->id || $user->id === $restaurant->proprietaire_id);
     }
 
     public function delete(User $user, Plat $plat): bool
     {
         $restaurant = $plat->categorie->restaurant;
-        return $user->hasRole('ADMIN_RESTAURANT') && 
+        return $user->hasRole('ADMIN') && 
                ($user->restaurant_id === $restaurant->id || $user->id === $restaurant->proprietaire_id);
     }
 

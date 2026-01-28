@@ -24,7 +24,7 @@ class UpdateRestaurantRequest extends FormRequest
         return [
             'nom' => 'sometimes|string|max:255',
             'adresse' => 'nullable|string|max:255',
-            'telephone' => 'nullable|string|max:20',
+            'telephone' => 'sometimes|string|max:20',
             'proprietaire_id' => 'sometimes|exists:users,id',
         ];
     }
