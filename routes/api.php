@@ -77,6 +77,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/restaurants/{restaurant}/transfer-ownership', [RestaurantController::class, 'transferOwnership']);
         
         Route::apiResource('restaurants.tables', TableController::class)->except(['index']);
+        Route::get('/restaurants/{restaurant}/tables/{table}/qrcode', [TableController::class, 'generateQrCode']);
         Route::apiResource('restaurants.categories', CategorieController::class)->except(['index']);
         Route::apiResource('restaurants.type_plats', \App\Http\Controllers\Api\V1\TypePlatController::class)->except(['index']);
         Route::apiResource('restaurants.boissons', \App\Http\Controllers\Api\V1\BoissonController::class)->except(['index']);

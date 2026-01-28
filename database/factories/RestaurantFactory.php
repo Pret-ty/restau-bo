@@ -17,9 +17,9 @@ class RestaurantFactory extends Factory
     public function definition(): array
     {
         return [
-            'nom' => fake()->company(),
-            'adresse' => fake()->address(),
-            'telephone' => fake()->phoneNumber(),
+            'nom' => $this->faker->company(),
+            'adresse' => $this->faker->address(),
+            'telephone' => $this->faker->phoneNumber(),
             'proprietaire_id' => \App\Models\User::factory(),
         ];
     }

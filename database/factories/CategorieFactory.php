@@ -9,7 +9,7 @@ class CategorieFactory extends Factory
     public function definition(): array
     {
         return [
-            'nom' => fake()->word(),
+            'nom' => $this->faker->word(),
             'restaurant_id' => \App\Models\Restaurant::factory(),
         ];
     }
