@@ -76,6 +76,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/restaurants/{restaurant}/stats', [RestaurantController::class, 'stats']);
         Route::post('/restaurants/{restaurant}/transfer-ownership', [RestaurantController::class, 'transferOwnership']);
         
+        Route::get('/restaurants/{restaurant}/tables/qrcodes/download', [TableController::class, 'downloadAllQrCodes']);
+        Route::post('/restaurants/{restaurant}/tables/bulk', [TableController::class, 'bulkStore']);
         Route::apiResource('restaurants.tables', TableController::class)->except(['index']);
         Route::get('/restaurants/{restaurant}/tables/{table}/qrcode', [TableController::class, 'generateQrCode']);
         Route::apiResource('restaurants.categories', CategorieController::class)->except(['index']);
