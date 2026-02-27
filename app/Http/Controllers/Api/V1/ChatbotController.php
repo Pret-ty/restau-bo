@@ -30,18 +30,21 @@ class ChatbotController extends Controller
                 $queryBoissons->where('restaurant_id', $request->restaurant_id);
             }
 
-            $plats = $queryPlats->get(['nom', 'prix']);
-            $boissons = $queryBoissons->get(['nom', 'prix']);
+            $plats = $queryPlats->get(['id', 'nom', 'prix', 'categorie_id']);
+            $boissons = $queryBoissons->get(['id', 'nom', 'prix', 'restaurant_id']);
 
             /** 2️⃣ Contexte menu **/
             $menuContext = "PLATS :\n";
             foreach ($plats as $plat) {
-                $menuContext .= "- {$plat->nom} : {$plat->prix} FCFA\n";
+                // Determine restaurant ID from category for plats
+                $restId = $request->restaurant_id ?? $plat->categorie->restaurant_id;
+                $menuContext .= "- ID: {$plat->id}, Nom: {$plat->nom}, Prix: {$plat->prix} FCFA, RestaurantID: {$restId}\n";
             }
 
             $menuContext .= "\nBOISSONS :\n";
             foreach ($boissons as $boisson) {
-                $menuContext .= "- {$boisson->nom} : {$boisson->prix} FCFA\n";
+                $restId = $request->restaurant_id ?? $boisson->restaurant_id;
+                $menuContext .= "- ID: {$boisson->id}, Nom: {$boisson->nom}, Prix: {$boisson->prix} FCFA, RestaurantID: {$restId}\n";
             }
 
             /** 3️⃣ Prompt **/
@@ -62,10 +65,10 @@ Format JSON attendu :
   "summary": "Résumé",
   "menu": {
     "plats": [
-      { "nom": "Plat", "quantite": 1, "prix_unitaire": 1000, "prix_total": 1000 }
+      { "id": 1, "restaurant_id": 1, "nom": "Plat", "quantite": 1, "prix_unitaire": 1000, "prix_total": 1000 }
     ],
     "boissons": [
-      { "nom": "Boisson", "quantite": 2, "prix_unitaire": 500, "prix_total": 1000 }
+      { "id": 2, "restaurant_id": 1, "nom": "Boisson", "quantite": 2, "prix_unitaire": 500, "prix_total": 1000 }
     ]
   },
   "total": 2000,
