@@ -15,7 +15,12 @@ class OrderGuestMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->header('X-Order-Token');
+        // Allow authenticated users to bypass the guest token check
+        if ($request->user('sanctum')) {
+            return $next($request);
+        }
+
+        $token = $request->header('X-Order-Token') ?? $request->input('order_token') ?? $request->query('order_token');
 
         if (!$token) {
             return response()->json(['message' => 'Missing Order Token'], 403);

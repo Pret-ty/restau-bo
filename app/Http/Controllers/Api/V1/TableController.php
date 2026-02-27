@@ -59,6 +59,61 @@ class TableController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *      path="/api/v1/restaurants/{restaurantId}/tables/bulk",
+     *      operationId="bulkStoreTables",
+     *      tags={"Tables"},
+     *      summary="Store multiple tables at once",
+     *      security={{"sanctum":{}}},
+     *      @OA\Parameter(name="restaurantId", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="prefix", type="string", example="Table "),
+     *              @OA\Property(property="count", type="integer", example=10),
+     *              @OA\Property(property="start_index", type="integer", example=1)
+     *          )
+     *      ),
+     *      @OA\Response(response=201, description="Tables Created")
+     * )
+     */
+    public function bulkStore(Request $request, $restaurantId)
+    {
+        $this->authorize('create', \App\Models\Table::class);
+        
+        $request->validate([
+            'prefix' => 'required|string',
+            'count' => 'required|integer|min:1|max:50',
+            'start_index' => 'required|integer|min:1'
+        ]);
+
+        $restaurant = \App\Models\Restaurant::findOrFail($restaurantId);
+        $this->authorize('update', $restaurant);
+
+        $tables = [];
+        $prefix = $request->prefix;
+        $count = $request->count;
+        $startIndex = $request->start_index;
+
+        for ($i = 0; $i < $count; $i++) {
+            $numero = $prefix . ($startIndex + $i);
+            
+            // Check if table already exists to avoid duplicates
+            if (!$restaurant->tables()->where('numero', $numero)->exists()) {
+                $tables[] = $restaurant->tables()->create([
+                    'numero' => $numero
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true, 
+            'message' => count($tables) . ' tables créées avec succès.',
+            'data' => $tables
+        ], 201);
+    }
+
+    /**
      * @OA\Get(
      *      path="/api/v1/restaurants/{restaurantId}/tables/{id}",
      *      operationId="getTableById",
@@ -143,4 +198,45 @@ class TableController extends Controller
 
         return response($qrCode)->header('Content-Type', 'image/svg+xml');
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/restaurants/{restaurantId}/tables/qrcodes/download",
+     *      operationId="downloadAllTableQrCodes",
+     *      tags={"Tables"},
+     *      summary="Get all table QR codes as SVG strings for printing",
+     *      @OA\Parameter(name="restaurantId", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="List of QR Codes")
+     * )
+     */
+    public function downloadAllQrCodes($restaurantId)
+    {
+        $tables = \App\Models\Table::where('restaurant_id', $restaurantId)->get();
+        if ($tables->isEmpty()) {
+            return response()->json(['message' => 'Aucune table trouvée pour ce restaurant.'], 404);
+        }
+
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $qrCodesList = [];
+
+        foreach ($tables as $table) {
+            $url = "{$frontendUrl}/restaurants/{$restaurantId}/menu?table={$table->id}";
+            $qrCodeSvg = QrCode::size(300)
+                ->format('svg')
+                ->margin(1)
+                ->generate($url);
+            
+            $qrCodesList[] = [
+                'id' => $table->id,
+                'numero' => $table->numero,
+                'svg' => (string) $qrCodeSvg
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $qrCodesList
+        ]);
+    }
 }
+
